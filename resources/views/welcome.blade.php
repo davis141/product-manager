@@ -114,12 +114,13 @@
             </div>
         </div>
     </div>
-    @push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
             loadProducts();
 
-           
+
             $('#productForm').submit(function(e) {
                 e.preventDefault();
 
@@ -161,7 +162,11 @@
                         tableBody.append(row);
                     });
 
-                    $('#grandTotal').text('$${response.grand_total.toFixed(2)}');
+                    if (response.grand_total !== undefined) {
+                        $('#grandTotal').text(`$${response.grand_total.toFixed(2)}`);
+                    } else {
+                        console.error("grand_total not found in response");
+                    }
 
                     $('.edit-btn').click(function() {
                         const row = $(this).closest('tr');
@@ -201,7 +206,6 @@
             });
         });
     </script>
-    @endpush
 </body>
 
 </html>

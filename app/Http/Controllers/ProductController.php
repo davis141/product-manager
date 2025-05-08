@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreProductRequest;
 
 class ProductController extends Controller
 {
@@ -11,54 +13,50 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        return view('welcome');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+
+    public function store(StoreProductRequest $request)
     {
-        //
+        $product = Product::create([
+            'product_name' => $request->product_name,
+            'quantity' => $request->quantity,
+            'price' => $request->price,
+            'total_value' => $request->quantity * $request->price
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'product' => $product
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, Product $product)
     {
-        //
-    }
+        $request->validate([
+            'product_name' => 'required|string',
+            'quantity' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0.01'
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $product->update([
+            'product_name' => $request->product_name,
+            'quantity' => $request->quantity,
+            'price' => $request->price,
+            'total_value' => $request->quantity * $request->price
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return response()->json(['success' => true]);
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function getProducts()
     {
-        //
-    }
+        $products = Product::orderBy('created_at', 'desc')->get();
+        $grandTotal = Product::sum('total_value');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'products' => $products,
+            'grand_total' => $grandTotal
+        ]);
     }
 }
